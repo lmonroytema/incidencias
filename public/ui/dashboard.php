@@ -113,6 +113,6 @@
     </div>
   </div>
 
-  <script type="module" src="/ui/dashboard.js"></script>
+  <script type="module" src="/ui/dashboard.js?v=delbtn"></script>
 </body>
 <html>

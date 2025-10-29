@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    # Evitar listado de directorios en la raíz
+    Options -Indexes
+
+    RewriteEngine On
+
+    # Evita bucles si la URL ya apunta a /public
+    RewriteCond %{REQUEST_URI} !^/public/
+
+    # Si el recurso existe dentro de /public, servirlo directamente
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -d
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # En caso contrario, delega al front controller de Laravel en /public
+    RewriteRule ^(.*)$ public/index.php [L]
+</IfModule>
+
+# Si mod_rewrite no está habilitado, asegúrate de configurar el DocumentRoot a /public

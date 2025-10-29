@@ -60,6 +60,30 @@ async function fetchIncidents(){
       viewBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7Zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z" fill="currentColor"/></svg>';
       viewBtn.addEventListener('click', ()=> showIncidentDetailById(inc.id));
       actionTd.appendChild(viewBtn);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn danger';
+      delBtn.title = 'Eliminar incidencia';
+      delBtn.setAttribute('aria-label', 'Eliminar incidencia');
+      delBtn.style.marginLeft = '8px';
+      delBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 3h6a1 1 0 0 1 1 1v1h4a1 1 0 1 1 0 2h-1v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7H4a1 1 0 1 1 0-2h4V4a1 1 0 0 1 1-1Zm1 3V4h4v2h-4Zm-2 4a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Zm4 0a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Zm4 0a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Z" fill="currentColor"/></svg>';
+      delBtn.addEventListener('click', async ()=>{
+        if(!confirm(`¿Desea borrar la incidencia #${inc.id}? Esta acción no se puede deshacer.`)) return;
+        try{
+          await apiFetch(`/incidencias/${inc.id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dni_type: inc.dni_type, dni_number: inc.dni_number })
+          });
+          showToast('Incidencia eliminada');
+          // Re-cargar manteniendo filtros/paginación actuales
+          await fetchIncidents();
+        }catch(err){
+          const msg = err?.data?.message || 'No se pudo eliminar la incidencia';
+          showToast(msg);
+        }
+      });
+      actionTd.appendChild(delBtn);
       tbody.appendChild(tr);
     });
     // Render pager

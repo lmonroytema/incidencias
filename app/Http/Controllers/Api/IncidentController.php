@@ -253,4 +253,49 @@ class IncidentController extends Controller
         $mime = $att->mime ?: 'application/octet-stream';
         return response($content, 200)->header('Content-Type', $mime);
     }
+
+    /**
+     * Delete an incident. Intended for collaborator UI: requires dni_type and dni_number
+     * to match the incident before allowing deletion. Also removes stored attachments.
+     */
+    public function destroy($id, Request $request)
+    {
+        $incident = Incident::with('attachments')->findOrFail($id);
+
+        // Validate required collaborator identifiers
+        $validator = Validator::make($request->all(), [
+            'dni_type' => 'required',
+            'dni_number' => 'required|string',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Map numeric dni_type codes to textual values for comparison
+        $dniTypeRaw = (string) $request->input('dni_type');
+        $dniType = match ($dniTypeRaw) {
+            '1' => 'DNI',
+            '2' => 'CE',
+            default => $dniTypeRaw,
+        };
+        $dniNumber = (string) $request->input('dni_number');
+
+        if ($incident->dni_type !== $dniType || $incident->dni_number !== $dniNumber) {
+            return response()->json(['message' => 'Los datos del colaborador no coinciden con la incidencia a eliminar'], 403);
+        }
+
+        // Delete attachments from storage and DB
+        foreach ($incident->attachments as $att) {
+            if ($att->path && Storage::exists($att->path)) {
+                @Storage::delete($att->path);
+            }
+            $att->delete();
+        }
+        // Also remove the directory if present
+        @Storage::deleteDirectory('attachments/' . $incident->id);
+
+        $incident->delete();
+
+        return response()->json(['message' => 'Incidencia eliminada'], 200);
+    }
 }

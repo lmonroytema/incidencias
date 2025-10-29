@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Incidencias | Reportar</title>
-  <link rel="stylesheet" href="/ui/styles.css">
+  <link rel="stylesheet" href="/ui/styles.css?v=delbtn">
 </head>
 <body>
   <div class="container">
@@ -173,6 +173,6 @@
     </div>
   </div>
 
-  <script type="module" src="/ui/report.js"></script>
+  <script type="module" src="/ui/report.js?v=delbtn"></script>
 </body>
 </html>

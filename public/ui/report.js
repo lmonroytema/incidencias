@@ -198,7 +198,12 @@ function renderIncidentList(rows){
       <td>${inc.urgency||''}</td>
       <td>${inc.status||'Pendiente'}</td>
       <td>${imgCell}</td>
-      <td><button class="btn secondary" data-action="edit" data-id="${inc.id}">Editar</button></td>
+      <td class="flex">
+        <button class="btn secondary" data-action="edit" data-id="${inc.id}">Editar</button>
+        <button class="btn danger" data-action="delete" data-id="${inc.id}" title="Eliminar incidencia" aria-label="Eliminar incidencia">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 3h6a1 1 0 0 1 1 1v1h4a1 1 0 1 1 0 2h-1v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7H4a1 1 0 1 1 0-2h4V4a1 1 0 0 1 1-1Zm1 3V4h4v2h-4Zm-2 4a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Zm4 0a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Zm4 0a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Z" fill="currentColor"/></svg>
+        </button>
+      </td>
     `;
     listTbody.appendChild(tr);
 
@@ -228,6 +233,30 @@ function renderIncidentList(rows){
             activateTab('inc');
           }
         });
+    });
+  });
+
+  // Acción: borrar incidencia
+  listTbody.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+    btn.addEventListener('click', async ()=>{
+      const id = Number(btn.getAttribute('data-id'));
+      const dni_type = el('dni_type').value;
+      const dni_number = el('dni_number').value.trim();
+      if(!dni_number){ showToast('Ingrese número de documento'); return; }
+      if(!confirm(`¿Desea borrar la incidencia #${id}? Esta acción no se puede deshacer.`)) return;
+      try{
+        await apiFetch(`/incidencias/${id}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dni_type, dni_number })
+        });
+        showToast('Incidencia eliminada');
+        // Refrescar listado
+        await loadIncidentList(dni_type, dni_number);
+      }catch(err){
+        const msg = err?.data?.message || 'No se pudo eliminar la incidencia';
+        showToast(msg);
+      }
     });
   });
 }
