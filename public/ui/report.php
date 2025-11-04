@@ -15,14 +15,31 @@
       <a href="/ui/dashboard.php">Panel de consultor</a>
       <span class="muted">/ Reportar</span>
     </nav>
+    <!-- Sección informativa sobre la finalidad del registro -->
+    <section class="card" aria-labelledby="infoTitle">
+      <h2 id="infoTitle" class="title">Finalidad del registro</h2>
+      <p class="muted">
+        Este formulario permite registrar las incidencias actuales que presentan los usuarios de Tema Litoclean
+        después de la migración de Tenant. El objetivo es reunir información precisa para dar soporte y remediación
+        en las aplicaciones relacionadas a Microsoft 365 y en la ofimática de los equipos de los colaboradores.
+      </p>
+      <div class="flex" style="flex-wrap:wrap; gap:8px">
+        <span class="badge app-teams">Teams</span>
+        <span class="badge app-onedrive">OneDrive</span>
+        <span class="badge app-sharepoint">SharePoint</span>
+        <span class="badge app-outlook">Outlook</span>
+        <span class="badge app-office">Office</span>
+        <span class="badge app-pc">PCs/Ofimática</span>
+      </div>
+    </section>
 
     <div class="tabs">
-      <button id="tabColaborador" class="tab active" type="button">Validador del colaborador</button>
+      <button id="tabColaborador" class="tab active" type="button">Colaborador</button>
       <button id="tabIncidencia" class="tab" type="button" disabled>Detalle de la incidencia</button>
     </div>
 
     <section id="paneColaborador" class="card pane">
-      <h2 class="title">Validador del colaborador</h2>
+      <h2 class="title">Datos del colaborador</h2>
       <div class="row">
         <div>
           <label for="dni_type">Tipo de documento</label>

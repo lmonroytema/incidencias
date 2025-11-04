@@ -1,5 +1,5 @@
 /* Modern UI styles (dark theme) for Incidencias UI */
-:root { --bg:#0c0c0f; --panel:#141419; --text:#e6e6ea; --muted:#a9a9b8; --primary:#7c3aed; --primary-2:#22d3ee; --danger:#ef4444; --ok:#10b981; --border:#262630; }
+:root { --bg:#0b2a3b; --panel:#141419; --text:#e6e6ea; --muted:#a9a9b8; --primary:#7c3aed; --primary-2:#22d3ee; --danger:#ef4444; --ok:#10b981; --border:#262630; }
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -59,6 +59,12 @@ textarea{min-height:100px}
 .badge.warning{background:#2b2835;color:#facc15}
 .badge.danger{background:#33212b;color:#fecaca}
 .badge.ok{background:#17322c;color:#a7f3d0}
+.badge.app-teams{background:linear-gradient(180deg,#6b6fb4,#4e528f);color:#fff;border-color:#4e528f}
+.badge.app-onedrive{background:linear-gradient(180deg,#0a84d0,#0869b7);color:#fff;border-color:#0869b7}
+.badge.app-sharepoint{background:linear-gradient(180deg,#0b8b79,#086b63);color:#fff;border-color:#086b63}
+.badge.app-outlook{background:linear-gradient(180deg,#0078d4,#0a66c2);color:#fff;border-color:#0a66c2}
+.badge.app-office{background:linear-gradient(180deg,#d83b01,#a23201);color:#fff;border-color:#a23201}
+.badge.app-pc{background:linear-gradient(180deg,#00bcf2,#0899d0);color:#fff;border-color:#0899d0}
 .muted{color:var(--muted)}
 .input-inline{display:flex;gap:8px}
 .visually-hidden-file{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
