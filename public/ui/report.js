@@ -199,7 +199,10 @@ function renderIncidentList(rows){
       <td>${inc.status||'Pendiente'}</td>
       <td>${imgCell}</td>
       <td class="flex">
-        <button class="btn secondary" data-action="edit" data-id="${inc.id}">Editar</button>
+        <button class="btn secondary" data-action="edit" data-id="${inc.id}" title="Editar incidencia" aria-label="Editar incidencia">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm14.71-9.46a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83Z" fill="currentColor"/></svg>
+          <span style="margin-left:6px">Editar</span>
+        </button>
         <button class="btn danger" data-action="delete" data-id="${inc.id}" title="Eliminar incidencia" aria-label="Eliminar incidencia">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 3h6a1 1 0 0 1 1 1v1h4a1 1 0 1 1 0 2h-1v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7H4a1 1 0 1 1 0-2h4V4a1 1 0 0 1 1-1Zm1 3V4h4v2h-4Zm-2 4a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Zm4 0a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Zm4 0a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Z" fill="currentColor"/></svg>
         </button>

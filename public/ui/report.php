@@ -5,14 +5,23 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Incidencias | Reportar</title>
-  <link rel="stylesheet" href="/ui/styles.css?v=delbtn">
+  <link rel="stylesheet" href="/ui/styles.css?v=theme1">
 </head>
 <body>
   <div class="container">
     <nav class="nav">
-      <a href="/ui/report.php">Reportar incidencia</a>
-      <a href="/ui/login.php">Login consultor</a>
-      <a href="/ui/dashboard.php">Panel de consultor</a>
+      <a href="/ui/report.php" title="Reportar incidencia">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 3h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 4v11h12V9h-2v2H9V7H7Zm4 0v2h4V7h-4Z"/></svg>
+        <span style="margin-left:6px">Reportar incidencia</span>
+      </a>
+      <a href="/ui/login.php" title="Login consultor">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6ZM4 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2H4Z"/></svg>
+        <span style="margin-left:6px">Login consultor</span>
+      </a>
+      <a href="/ui/dashboard.php" title="Panel de consultor">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h8v8H3V3Zm10 0h8v6h-8V3ZM3 13h6v8H3v-8Zm8 6h10v2H11v-2Z"/></svg>
+        <span style="margin-left:6px">Panel de consultor</span>
+      </a>
       <span class="muted">/ Reportar</span>
     </nav>
     <!-- Sección informativa sobre la finalidad del registro -->
@@ -117,8 +126,11 @@
       <div>
         <label for="attachments">Adjuntos (opcional)</label>
         <div class="input-inline">
-          <input type="file" id="attachments" name="attachments[]" multiple class="visually-hidden-file" />
-          <label for="attachments" class="btn secondary" id="btnAttachLabel">Adjuntar imagen</label>
+            <input type="file" id="attachments" name="attachments[]" multiple class="visually-hidden-file" />
+          <label for="attachments" class="btn secondary" id="btnAttachLabel">
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 13.5V7a5 5 0 0 1 10 0v8a6.5 6.5 0 1 1-13 0V7a3.5 3.5 0 1 1 7 0v7.5a2 2 0 1 1-4 0V7h2v7.5a.5.5 0 1 0 1 0V7a1.5 1.5 0 0 0-3 0v8a4.5 4.5 0 1 0 9 0V7a3 3 0 1 0-6 0v6.5H7Z"/></svg>
+            <span style="margin-left:6px">Adjuntar imagen</span>
+          </label>
           <button class="btn secondary" id="btnInlineViewImage" type="button" title="Doble clic para ver imagen" style="display:none">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7Zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z" fill="currentColor"/></svg>
             <span style="margin-left:6px">Ver</span>
@@ -127,8 +139,14 @@
         </div>
       </div>
       <div class="footer">
-        <button class="btn" id="btnSubmit">Enviar incidencia</button>
-        <button class="btn secondary" id="btnNewIncident" type="button">Nueva incidencia</button>
+        <button class="btn" id="btnSubmit">
+          <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 20v-6l14-6-6 14H5l-2 2Zm11.72-12.44 1.41 1.41L8.87 16.25l-1.41-1.41 7.27-7.27Z"/></svg>
+          <span style="margin-left:6px">Enviar incidencia</span>
+        </button>
+        <button class="btn secondary" id="btnNewIncident" type="button">
+          <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span style="margin-left:6px">Nueva incidencia</span>
+        </button>
       </div>
       <hr>
       <h3 class="title">Incidencias del colaborador</h3>
