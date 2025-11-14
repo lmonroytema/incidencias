@@ -1,4 +1,4 @@
-import { apiFetch, setToken, setConsultantInfo, showToast } from '/ui/config.js';
+import { apiFetch, setToken, setConsultantInfo, showToast } from './config.js';
 
 // Toggle de visibilidad de contraseña
 const passwordInput = document.getElementById('password');
@@ -25,7 +25,8 @@ form?.addEventListener('submit', async (e) => {
     setToken(data.token);
     setConsultantInfo(data.consultant);
     showToast('Sesión iniciada');
-    window.location.href = '/ui/dashboard.php';
+    const ROOT = new URL(import.meta.url).pathname.split('/ui/')[0] || '';
+    window.location.href = ROOT + '/ui/dashboard.php';
   } catch (err) {
     const msg = err?.data?.message || 'Error de autenticación';
     showToast(msg);

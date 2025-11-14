@@ -1,5 +1,18 @@
 // Simple UI config for Incidencias
-export const BASE_API = '/api'; // relative to Laravel public root
+// Detect app root prefix dynamically (supports subfolders like /incidencias)
+const PREFIX = (()=>{
+  try {
+    const p = new URL(import.meta.url).pathname;
+    const parts = p.split('/ui/');
+    return parts[0] || '';
+  } catch {
+    // Fallback: derive from location
+    const loc = (typeof window !== 'undefined' ? window.location.pathname : '') || '';
+    const parts = loc.split('/ui/');
+    return parts[0] || '';
+  }
+})();
+export const BASE_API = PREFIX + '/api'; // relative to Laravel public root
 
 export const tokenKey = 'apiToken';
 export const consultantKey = 'consultantInfo';
@@ -23,7 +36,12 @@ export async function apiFetch(path, opts={}){
     ...(opts.headers||{})
   };
   const t = getToken();
-  if (t) headers['X-API-TOKEN'] = t;
+  if (t) {
+    headers['X-API-TOKEN'] = t;
+    // En algunos hostings/proxies se pierden headers personalizados.
+    // Añadimos también Authorization: Bearer para mayor compatibilidad.
+    headers['Authorization'] = `Bearer ${t}`;
+  }
   const res = await fetch(BASE_API + path, { ...opts, headers });
   const ct = res.headers.get('content-type') || '';
   const isJson = ct.includes('application/json');

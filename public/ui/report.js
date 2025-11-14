@@ -1,4 +1,4 @@
-import { apiFetch, showToast } from '/ui/config.js';
+import { apiFetch, showToast } from './config.js';
 
 const categories = [
   'Conectividad y autenticación Office 365',

@@ -11,7 +11,7 @@ class Attachment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'incident_id', 'filename', 'path', 'mime', 'size',
+        'incident_id', 'filename', 'path', 'mime', 'size', 'source',
     ];
 
     public function incident(): BelongsTo

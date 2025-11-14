@@ -13,6 +13,10 @@
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
+    # Propagar X-API-TOKEN (algunos hostings requieren exponerlo explícitamente)
+    RewriteCond %{HTTP:X-API-TOKEN} .
+    RewriteRule .* - [E=HTTP_X_API_TOKEN:%{HTTP:X-API-TOKEN}]
+
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$

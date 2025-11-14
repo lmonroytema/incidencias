@@ -16,7 +16,19 @@ class ApiTokenMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // 1) Header personalizado
         $token = $request->header('X-API-TOKEN');
+        // 2) Authorization: Bearer <token>
+        if (!$token) {
+            $auth = $request->header('Authorization');
+            if ($auth && stripos($auth, 'Bearer ') === 0) {
+                $token = trim(substr($auth, 7));
+            }
+        }
+        // 3) Parametro en cuerpo/query como última opción (por hosting que filtra headers)
+        if (!$token) {
+            $token = $request->input('api_token') ?: $request->input('token');
+        }
         if (!$token) {
             return response()->json(['message' => 'Token requerido'], 401);
         }

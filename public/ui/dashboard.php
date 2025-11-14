@@ -1,28 +1,31 @@
-<?php /* Consultant Dashboard without Blade */ ?>
+<?php /* Consultant Dashboard without Blade */ 
+  $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+  if (substr($base, -3) === '/ui') { $base = substr($base, 0, -3); }
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Incidencias | Panel</title>
-  <link rel="stylesheet" href="/ui/styles.css?v=theme1">
+  <link rel="stylesheet" href="<?= $base ?>/ui/styles.css?v=theme1">
 </head>
 <body>
   <script>
     try {
       var t = localStorage.getItem('apiToken');
-      if (!t) { window.location.href = '/consultor/login'; }
+      if (!t) { window.location.href = '<?= $base ?>/consultor/login'; }
     } catch (e) {
-      window.location.href = '/consultor/login';
+      window.location.href = '<?= $base ?>/consultor/login';
     }
   </script>
   <div class="container">
     <nav class="nav">
-      <a href="/ui/report.php" title="Reportar incidencia">
+      <a href="<?= $base ?>/ui/report.php" title="Reportar incidencia">
         <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 3h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 4v11h12V9h-2v2H9V7H7Zm4 0v2h4V7h-4Z"/></svg>
         <span style="margin-left:6px">Reportar incidencia</span>
       </a>
-      <a href="/ui/login.php" title="Login consultor">
+      <a href="<?= $base ?>/ui/login.php" title="Login consultor">
         <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6ZM4 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2H4Z"/></svg>
         <span style="margin-left:6px">Login consultor</span>
       </a>
@@ -37,6 +40,8 @@
           <select id="f_status">
             <option value="">Todos</option>
             <option>Pendiente</option>
+            <option>Evaluado</option>
+            <option>Atendido</option>
             <option>En revisión</option>
             <option>Resuelto</option>
             <option>Cerrado</option>
@@ -128,9 +133,38 @@
       <div class="modal-actions">
         <button class="btn" id="btnDetailClose" type="button">Cerrar</button>
       </div>
+      <div class="modal-text" id="detailAttachments" style="margin-top:12px;"></div>
     </div>
   </div>
 
-  <script type="module" src="/ui/dashboard.js?v=delbtn"></script>
+  <!-- Modal evaluación (cambio de estado y evidencia) -->
+  <div id="evalModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <h3 class="modal-title">Evaluar incidencia</h3>
+      <div class="modal-text">
+        <div class="input-inline" style="align-items:center">
+          <label for="evalStatus"><strong>Estado:</strong></label>
+          <select id="evalStatus">
+            <option value="Pendiente">Pendiente</option>
+            <option value="Evaluado">Evaluado</option>
+            <option value="Atendido">Atendido</option>
+            <option value="En revisión">En revisión</option>
+            <option value="Resuelto">Resuelto</option>
+            <option value="Cerrado">Cerrado</option>
+          </select>
+        </div>
+        <div class="input-inline" style="align-items:center;margin-top:10px">
+          <label for="evalEvidence"><strong>Adjuntar evidencia:</strong></label>
+          <input type="file" id="evalEvidence" accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="btnEvalSave" type="button">Guardar cambios</button>
+        <button class="btn secondary" id="btnEvalClose" type="button">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="<?= $base ?>/ui/dashboard.js?v=eval-modal"></script>
 </body>
 <html>

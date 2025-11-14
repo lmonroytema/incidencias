@@ -8,7 +8,8 @@ body{
   font:14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
   /* Fondo: imagen + overlay teal, fijo y a pantalla completa */
   background-color:var(--bg);
-  background-image: linear-gradient(rgba(11,120,132,.55), rgba(11,120,132,.55)), url('/ui/img/app-bg.jpg');
+  /* Quitamos imagen inexistente para evitar 404; mantenemos overlay gradiente */
+  background-image: linear-gradient(rgba(11,120,132,.55), rgba(11,120,132,.55));
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

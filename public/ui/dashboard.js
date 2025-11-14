@@ -1,4 +1,4 @@
-import { apiFetch, getToken, getConsultantInfo, showToast } from '/ui/config.js';
+import { apiFetch, getToken, getConsultantInfo, showToast, BASE_API } from './config.js';
 
 const tbody = document.querySelector('#incidentsTable tbody');
 const info = document.getElementById('consultantInfo');
@@ -12,7 +12,7 @@ renderConsultant();
 
 function rowStatusSelect(current){
   const s = document.createElement('select');
-  ['Pendiente','En revisión','Resuelto','Cerrado'].forEach(v=>{
+  ['Pendiente','Evaluado','Atendido','En revisión','Resuelto','Cerrado'].forEach(v=>{
     const o=document.createElement('option'); o.value=v; o.textContent=v; if(v===current) o.selected=true; s.appendChild(o);
   });
   return s;
@@ -61,6 +61,15 @@ async function fetchIncidents(){
       viewBtn.addEventListener('click', ()=> showIncidentDetailById(inc.id));
       actionTd.appendChild(viewBtn);
 
+      const evalBtn = document.createElement('button');
+      evalBtn.className = 'btn';
+      evalBtn.title = 'Evaluar (cambiar estado y adjuntar)';
+      evalBtn.setAttribute('aria-label', 'Evaluar incidencia');
+      evalBtn.style.marginLeft = '8px';
+      evalBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm18.71-10.04a1 1 0 0 0 0-1.41l-2.51-2.51a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 2-1.66Z" fill="currentColor"/></svg>';
+      evalBtn.addEventListener('click', ()=> showIncidentEvaluateById(inc.id));
+      actionTd.appendChild(evalBtn);
+
       const delBtn = document.createElement('button');
       delBtn.className = 'btn danger';
       delBtn.title = 'Eliminar incidencia';
@@ -105,6 +114,7 @@ function showIncidentDetailById(id){
       const modal = document.getElementById('detailModal');
       const content = document.getElementById('detailContent');
       const closeBtn = document.getElementById('btnDetailClose');
+      const attBox = document.getElementById('detailAttachments');
       if(!content || !modal) return;
       const created = inc?.created_at ? new Date(inc.created_at).toLocaleString() : '';
       const apps = Array.isArray(inc?.apps) ? inc.apps.join(', ') : (inc?.apps || '');
@@ -114,7 +124,7 @@ function showIncidentDetailById(id){
           <div><strong>Nombre:</strong> ${inc?.full_name||''}</div>
           <div><strong>Categoría:</strong> ${inc?.category||''}</div>
           <div><strong>Urgencia:</strong> ${inc?.urgency||''}</div>
-          <div><strong>Estado:</strong> ${inc?.status||'Pendiente'}</div>
+          <div><strong>Estado actual:</strong> ${inc?.status||'Pendiente'}</div>
           <div><strong>Fecha:</strong> ${created}</div>
           <div><strong>Área:</strong> ${inc?.area_name||''}</div>
           <div><strong>Correo:</strong> ${inc?.corporate_email||''}</div>
@@ -125,12 +135,103 @@ function showIncidentDetailById(id){
           <div style="grid-column:1/-1"><strong>Descripción:</strong><br>${(inc?.description||'').replace(/</g,'&lt;')}</div>
         </div>
       `;
+
+      if (attBox) {
+        const collabAtts = Array.isArray(inc?.attachments) ? inc.attachments : [];
+        const consultantAtts = Array.isArray(inc?.consultant_attachments) ? inc.consultant_attachments : [];
+
+        const renderList = (list, title) => {
+          if (!list || list.length === 0) {
+            return `<div class="muted">${title}: sin archivos</div>`;
+          }
+          const items = list.map(a => {
+            const isImg = (a?.mime||'').startsWith('image/');
+            const url = `${BASE_API}/attachments/${a.id}`;
+            const label = a?.filename || 'archivo';
+            const view = isImg
+              ? `<a href="${url}" target="_blank" class="btn secondary" title="Ver imagen">Ver imagen</a>`
+              : `<a href="${url}" target="_blank" class="btn secondary" title="Descargar">Descargar</a>`;
+            return `<div class="flex" style="gap:8px; align-items:center;">
+                      <span>${label}</span>
+                      ${view}
+                    </div>`;
+          }).join('');
+          return `<div><strong>${title}:</strong></div>${items}`;
+        };
+
+        attBox.innerHTML = [
+          renderList(collabAtts, 'Adjuntos del colaborador'),
+          '<hr style="margin:8px 0; opacity:0.25;">',
+          renderList(consultantAtts, 'Evidencias del consultor')
+        ].join('');
+      }
+
       modal.classList.remove('hidden');
       const onClose = ()=>{ modal.classList.add('hidden'); closeBtn?.removeEventListener('click', onClose); };
       closeBtn?.addEventListener('click', onClose);
     })
     .catch(err => {
       const msg = err?.data?.message || 'Error obteniendo detalle';
+      showToast(msg);
+    });
+}
+
+// Modal de evaluación (cambio de estado + evidencia)
+function showIncidentEvaluateById(id){
+  apiFetch(`/incidencias/${id}`)
+    .then(inc => {
+      const modal = document.getElementById('evalModal');
+      const statusSel = document.getElementById('evalStatus');
+      const evidenceInput = document.getElementById('evalEvidence');
+      const saveBtn = document.getElementById('btnEvalSave');
+      const closeBtn = document.getElementById('btnEvalClose');
+      if(!modal) return;
+
+      if (statusSel) {
+        statusSel.value = inc?.status || 'Pendiente';
+        if (!['Pendiente','Evaluado','Atendido','En revisión','Resuelto','Cerrado'].includes(statusSel.value)) statusSel.value = 'Pendiente';
+      }
+
+      // Siempre iniciar sin archivo seleccionado
+      if (evidenceInput) evidenceInput.value = '';
+
+      const handleStatusChange = ()=>{ if (evidenceInput) evidenceInput.value = ''; };
+      statusSel?.addEventListener('change', handleStatusChange);
+
+      modal.classList.remove('hidden');
+      const onClose = ()=>{ 
+        modal.classList.add('hidden'); 
+        closeBtn?.removeEventListener('click', onClose); 
+        saveBtn?.removeEventListener('click', onSave); 
+        statusSel?.removeEventListener('change', handleStatusChange);
+        if (evidenceInput) evidenceInput.value = '';
+      };
+      closeBtn?.addEventListener('click', onClose);
+
+      const onSave = async ()=>{
+        try{
+          const fd = new FormData();
+          fd.set('status', statusSel?.value || 'Pendiente');
+          const file = evidenceInput?.files?.[0];
+          if (file) fd.append('attachments[]', file);
+          fd.set('_method','PUT');
+          await apiFetch(`/incidencias/${id}`, { method: 'POST', body: fd });
+          showToast('Incidencia actualizada');
+          modal.classList.add('hidden');
+          closeBtn?.removeEventListener('click', onClose);
+          saveBtn?.removeEventListener('click', onSave);
+          statusSel?.removeEventListener('change', handleStatusChange);
+          if (evidenceInput) evidenceInput.value = '';
+          await fetchIncidents();
+        }catch(err){
+          const msg = err?.data?.message || 'No se pudo actualizar la incidencia';
+          showToast(msg);
+        }
+      };
+      saveBtn?.addEventListener('click', onSave);
+    })
+    .catch(err => {
+      const msg = err?.data?.message || 'Error abriendo evaluación';
       showToast(msg);
     });
 }

@@ -40,6 +40,11 @@ class IncidentController extends Controller
     public function show($id)
     {
         $incident = Incident::with(['assignedTo:id,name,email', 'attachments'])->findOrFail($id);
+        // Separar adjuntos del colaborador vs evidencias del consultor
+        $consultantAtts = $incident->attachments->where('source', 'consultant')->values();
+        $collabAtts = $incident->attachments->where('source', 'collaborator')->values();
+        $incident->setRelation('attachments', $collabAtts);
+        $incident->setRelation('consultant_attachments', $consultantAtts);
         return response()->json($incident);
     }
 
@@ -127,7 +132,7 @@ class IncidentController extends Controller
                     }
                 }
 
-                // Registrar nuevos adjuntos
+                // Registrar nuevos adjuntos (colaborador)
                 foreach ($files as $file) {
                     if (!$file) { continue; }
                     $path = $file->store('attachments/' . $existing->id);
@@ -137,6 +142,7 @@ class IncidentController extends Controller
                         'path' => $path,
                         'mime' => $file->getClientMimeType(),
                         'size' => $file->getSize(),
+                        'source' => 'collaborator',
                     ]);
                 }
             }
@@ -181,6 +187,7 @@ class IncidentController extends Controller
                     'path' => $path,
                     'mime' => $file->getClientMimeType(),
                     'size' => $file->getSize(),
+                    'source' => 'collaborator',
                 ]);
             }
         }
@@ -198,11 +205,12 @@ class IncidentController extends Controller
         $incident = Incident::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'status' => 'nullable|string|in:Pendiente,En revisión,Resuelto,Cerrado',
+            'status' => 'nullable|string|in:Pendiente,Evaluado,Atendido,En revisión,Resuelto,Cerrado',
             'assigned_to_id' => 'nullable|exists:consultants,id',
             'consultant_notes' => 'nullable|string',
             'resolution_date' => 'nullable|date',
             'solution_applied' => 'nullable|string',
+            'attachments.*' => 'nullable|file|max:10240',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -214,6 +222,23 @@ class IncidentController extends Controller
             $incident->assigned_to_id = $consultant->id;
         }
         $incident->save();
+
+        $files = $request->file('attachments');
+        if ($files) {
+            if (!is_array($files)) { $files = [$files]; }
+            foreach ($files as $file) {
+                if (!$file) { continue; }
+                $path = $file->store('attachments/' . $incident->id);
+                Attachment::create([
+                    'incident_id' => $incident->id,
+                    'filename' => $file->getClientOriginalName(),
+                    'path' => $path,
+                    'mime' => $file->getClientMimeType(),
+                    'size' => $file->getSize(),
+                    'source' => 'consultant',
+                ]);
+            }
+        }
 
         return response()->json($incident->load('assignedTo', 'attachments'));
     }
