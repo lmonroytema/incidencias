@@ -280,6 +280,32 @@ class IncidentController extends Controller
     }
 
     /**
+     * Delete a single attachment by ID. Only consultant attachments can be removed
+     * and requires authentication (api.token middleware).
+     */
+    public function deleteAttachment($id, Request $request)
+    {
+        $consultant = $request->attributes->get('consultant');
+        if (!$consultant) {
+            return response()->json(['message' => 'No autenticado'], 401);
+        }
+
+        $att = Attachment::findOrFail($id);
+        // Solo permitir borrar evidencias del consultor
+        if ($att->source !== 'consultant') {
+            return response()->json(['message' => 'Solo se pueden borrar evidencias del consultor'], 403);
+        }
+
+        // Eliminar archivo físico si existe
+        if ($att->path && Storage::exists($att->path)) {
+            @Storage::delete($att->path);
+        }
+        $att->delete();
+
+        return response()->json(['message' => 'Adjunto eliminado'], 200);
+    }
+
+    /**
      * Delete an incident. Intended for collaborator UI: requires dni_type and dni_number
      * to match the incident before allowing deletion. Also removes stored attachments.
      */

@@ -165,6 +165,6 @@
     </div>
   </div>
 
-  <script type="module" src="<?= $base ?>/ui/dashboard.js?v=eval-modal"></script>
+  <script type="module" src="<?= $base ?>/ui/dashboard.js?v=delete-icon"></script>
 </body>
 <html>

@@ -18,6 +18,9 @@ Route::middleware('api.token')->group(function () {
     Route::put('/incidencias/{id}', [IncidentController::class, 'update']);
     Route::get('/incidencias/export/excel', [IncidentController::class, 'exportExcel']);
 
+    // Borrado de adjuntos (solo consultor)
+    Route::delete('/attachments/{id}', [IncidentController::class, 'deleteAttachment']);
+
     Route::post('/logout', [ConsultantAuthController::class, 'logout']);
 });
 

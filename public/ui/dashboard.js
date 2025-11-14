@@ -140,7 +140,7 @@ function showIncidentDetailById(id){
         const collabAtts = Array.isArray(inc?.attachments) ? inc.attachments : [];
         const consultantAtts = Array.isArray(inc?.consultant_attachments) ? inc.consultant_attachments : [];
 
-        const renderList = (list, title) => {
+        const renderList = (list, title, canDelete = false) => {
           if (!list || list.length === 0) {
             return `<div class="muted">${title}: sin archivos</div>`;
           }
@@ -151,9 +151,15 @@ function showIncidentDetailById(id){
             const view = isImg
               ? `<a href="${url}" target="_blank" class="btn secondary" title="Ver imagen">Ver imagen</a>`
               : `<a href="${url}" target="_blank" class="btn secondary" title="Descargar">Descargar</a>`;
+            const del = canDelete
+              ? `<button class="btn danger" title="Borrar adjunto" aria-label="Borrar adjunto" data-att-id="${a.id}" style="margin-left:6px">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 3h6a1 1 0 0 1 1 1v1h4a1 1 0 1 1 0 2h-1v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7H4a1 1 0 1 1 0-2h4V4a1 1 0 0 1 1-1Zm1 3V4h4v2h-4Zm-2 4a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Zm4 0a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Zm4 0a1 1 0 1 1 2 0v7a1 1 0 1 1-2 0v-7Z"/></svg>
+                 </button>`
+              : '';
             return `<div class="flex" style="gap:8px; align-items:center;">
                       <span>${label}</span>
                       ${view}
+                      ${del}
                     </div>`;
           }).join('');
           return `<div><strong>${title}:</strong></div>${items}`;
@@ -162,8 +168,29 @@ function showIncidentDetailById(id){
         attBox.innerHTML = [
           renderList(collabAtts, 'Adjuntos del colaborador'),
           '<hr style="margin:8px 0; opacity:0.25;">',
-          renderList(consultantAtts, 'Evidencias del consultor')
+          renderList(consultantAtts, 'Evidencias del consultor', true)
         ].join('');
+
+        // Wire up delete buttons for consultant evidences
+        attBox.querySelectorAll('button[data-att-id]')?.forEach(btn => {
+          btn.addEventListener('click', async (e)=>{
+            const attId = btn.getAttribute('data-att-id');
+            if(!attId) return;
+            if(!confirm('¿Desea borrar este adjunto?')) return;
+            btn.disabled = true;
+            try{
+              await apiFetch(`/attachments/${attId}`, { method: 'DELETE' });
+              showToast('Adjunto eliminado');
+              // Recargar detalle para actualizar lista
+              showIncidentDetailById(id);
+            }catch(err){
+              const msg = err?.data?.message || 'No se pudo borrar el adjunto';
+              showToast(msg);
+            } finally {
+              btn.disabled = false;
+            }
+          });
+        });
       }
 
       modal.classList.remove('hidden');
